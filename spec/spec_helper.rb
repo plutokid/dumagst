@@ -18,7 +18,7 @@ require 'dumagst'
 Dumagst.configure do |config|
   config.host = "localhost"
   config.port = 6379
-  config.db = "test"
+  config.db = 2
 end
 
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration

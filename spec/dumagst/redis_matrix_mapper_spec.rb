@@ -1,7 +1,7 @@
-describe Dumagst::RedisKeyMapper do
+describe Dumagst::RedisMatrixMapper do
   let(:test_class) {
     Class.new do
-      include Dumagst::RedisKeyMapper
+      include Dumagst::RedisMatrixMapper
       def redis
         ::Dumagst.configuration.redis_connection
       end
@@ -44,6 +44,28 @@ describe Dumagst::RedisKeyMapper do
     end
     it "returns nil if no value has been stored under the key for x and y" do
       expect(subject.get_by_key(2, 3)).to eq(nil)
+    end
+  end
+
+  describe "#row_pattern" do
+    it "returns the pattern to select keys for given row" do
+      expect(subject.row_pattern(4)).to eq("sample.4.*")
+    end
+  end
+
+  describe "#column_pattern" do
+    it "returns the pattern to select keys for given column" do
+      expect(subject.column_pattern(42)).to eq("sample.*.42")
+    end
+  end
+
+  describe "reverse_key" do
+    it "given a key, returns the array of [row, column] integers" do
+      expect(subject.reverse_key("sample.12.34")).to eq([12, 34])
+    end
+    it "raises given invalid key(s)" do
+      expect { subject.reverse_key("ohnoes")}.to raise_error
+      expect { subject.reverse_key("ohnoes.1")}.to raise_error
     end
   end
 end

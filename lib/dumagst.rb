@@ -1,7 +1,10 @@
 require 'redis'
 require "dumagst/version"
-require "dumagst/redis_key_mapper"
+require "dumagst/redis_matrix_mapper"
 require "dumagst/matrix"
+require "dumagst/engines/base"
+require "dumagst/engines/jaccard_similarity"
+require "dumagst/engines/jaccard_engine"
 
 module Dumagst
   # Your code goes here...
