@@ -4,6 +4,7 @@ module Dumagst
       
       def initialize(opts)
         @opts = opts
+        @filename = opts.fetch(:filename)
       end
 
       def process
@@ -12,6 +13,16 @@ module Dumagst
 
       def recommend(opts)
         raise "Implement #recommend in a subclass!"
+      end
+
+      def flush
+
+      end
+
+      protected
+
+      def redis
+        Dumagst.configuration.redis_connection
       end
 
     end

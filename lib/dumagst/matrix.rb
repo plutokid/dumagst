@@ -43,7 +43,7 @@ module Dumagst
       column = Array.new(@rows_count, VALUE_UNSET)
       redis.keys(column_pattern(y)).each do |key|
         parts = reverse_key(key)
-        column[parts[0]] = VALUE_SET
+        column[parts[0] - 1] = VALUE_SET
       end
       column
     end
@@ -59,7 +59,7 @@ module Dumagst
     end
 
     def column_in_bounds?(column)
-      column < @columns_count
+      column <= @columns_count
     end
 
     def increment_rows_count_if_needed(value)

@@ -47,16 +47,24 @@ describe Dumagst::Matrix do
   end
 
   describe "#column" do
-    let(:csv_file) { File.join(File.dirname(__FILE__), "..", "fixtures", "products_users.csv") }
+    let(:csv_file) { File.join(File.dirname(__FILE__), "..", "fixtures", "jaccard_10.csv") }
+    after(:each) { Dumagst.configuration.redis_connection.flushdb }
     subject { Dumagst::Matrix.from_csv(csv_file) }
     it "returns the column as an array with correct size" do
-      col = subject.column(845)
+      col = subject.column(4)
       expect(col).to be_a(Array)
-      expect(col.size).to eq(1448)
+      expect(col.size).to eq(9)
     end
-    it "returns the column as an array with the correct number of ones" do
-      col = subject.column(137)
-      expect(col.select { |e| e == 1}.count).to eq(2)
+    it "works correctly for the edge cases" do
+      expect(subject.column(1)).to eq([0, 1, 1, 0, 1, 0, 0, 0, 0])
+      expect(subject.column(8)).to eq([1, 0, 0, 0, 0, 1, 0, 0, 0])
+    end
+    it "returns the column as an array with the correct number of ones at the correct positions" do
+      col = subject.column(5)
+      expect(col.select { |e| e == 1}.count).to eq(3)
+      expect(col[0]).to eq(1)
+      expect(col[3]).to eq(1)
+      expect(col[5]).to eq(1)
     end
   end
 end
