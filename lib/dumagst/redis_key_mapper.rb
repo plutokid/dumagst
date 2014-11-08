@@ -10,12 +10,14 @@ module Dumagst
     end
 
     def key_for(x,y)
+      puts x.inspect
+      puts y.inspect
       raise KeyError, "invalid value for x : #{x}" if x.to_f < 0 || x.nil?
       raise KeyError, "invalid value for y : #{y}" if y.to_f < 0 || y.nil?
       [
         "#{key_prefix}",
-        x,
-        y
+        x.to_s,
+        y.to_s
       ].join(".")
     end
   end
