@@ -1,13 +1,10 @@
-
-require 'redis'
-
-module DuMagst
+module Dumagst
   class Matrix
     attr_accessor :rows, :columns, :dimensions
 
-    def initialize(dimensions)
-      @dimensions = dimensions
-      @redis = ::DuMagst.configuration.redis_connection
+    def initialize(dimension_x, dimension_y)
+      @dimensions = [dimension_x, dimension_y]
+      @redis = ::Dumagst.configuration.redis_connection
     end
 
     def rows_count
@@ -18,12 +15,12 @@ module DuMagst
       @dimensions[1]
     end
 
-    def [](x,y)
+    def [](x, y)
       get_by_key(x,y).to_f
     end
 
-    def []=(x,y)
-      set_by_key(x,y)
+    def []=(x, y, v)
+      set_by_key(x, y, v)
     end
 
     private
@@ -34,6 +31,6 @@ module DuMagst
       "matrix"
     end
 
-    include Dumagst::RedisKeyMapper
+    include RedisKeyMapper
   end
 end

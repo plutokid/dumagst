@@ -1,7 +1,8 @@
 module Dumagst
   module RedisKeyMapper
     def get_by_key(x,y)
-      redis.get(key_for(x, y))
+      value = redis.get(key_for(x, y))
+      value ? value.to_f : value
     end
 
     def set_by_key(x,y, value)
