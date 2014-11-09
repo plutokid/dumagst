@@ -14,7 +14,6 @@ module Dumagst
           CSV.foreach(filename, col_sep: ",") do |row|
             product_id = row[0]
             user_id = row[1]
-            puts "setting #{product_id}, #{user_id}"
             m[product_id, user_id] = Base::VALUE_SET
           end
           m
