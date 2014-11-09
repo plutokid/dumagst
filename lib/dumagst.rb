@@ -1,7 +1,8 @@
 require 'redis'
 require "dumagst/version"
-require "dumagst/redis_matrix_mapper"
-require "dumagst/matrix"
+require "dumagst/matrices/base"
+require "dumagst/matrices/redis_matrix_mapper"
+require "dumagst/matrices/redis_matrix"
 require "dumagst/engines/base"
 require "dumagst/engines/jaccard_similarity"
 require "dumagst/engines/jaccard_engine"

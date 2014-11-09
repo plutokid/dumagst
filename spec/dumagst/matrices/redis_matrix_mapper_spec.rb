@@ -1,7 +1,7 @@
-describe Dumagst::RedisMatrixMapper do
+describe Dumagst::Matrices::RedisMatrixMapper do
   let(:test_class) {
     Class.new do
-      include Dumagst::RedisMatrixMapper
+      include Dumagst::Matrices::RedisMatrixMapper
       def redis
         ::Dumagst.configuration.redis_connection
       end

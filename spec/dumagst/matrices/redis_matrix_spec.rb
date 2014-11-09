@@ -1,5 +1,5 @@
-describe Dumagst::Matrix do
-  subject { Dumagst::Matrix.new }
+describe Dumagst::Matrices::RedisMatrix do
+  subject { Dumagst::Matrices::RedisMatrix.new(matrix_key: "matrix") }
   describe "#[]" do
     before(:each) { subject.send(:redis).flushdb }
     it "returns zero if the element has not been set" do
@@ -33,23 +33,23 @@ describe Dumagst::Matrix do
 
   describe ".from_csv" do
     before(:each) { subject.send(:redis).flushdb }
-    let(:csv_file) { File.join(File.dirname(__FILE__), "..", "fixtures", "products_users.csv") }
-    subject { Dumagst::Matrix.from_csv(csv_file) }
+    let(:csv_file) { File.join(File.dirname(__FILE__), "..", "..", "fixtures", "products_users.csv") }
+    subject { Dumagst::Matrices::RedisMatrix.from_csv(csv_file) }
     it "produces a matrix with correct dimensions" do
-      expect(subject).to be_a(Dumagst::Matrix)
+      expect(subject).to be_a(Dumagst::Matrices::RedisMatrix)
       expect(subject.dimensions).to eq([1448, 943])
     end
     it "produces a matrix with values correctly set" do
-      m = Dumagst::Matrix.from_csv(csv_file)
+      m = Dumagst::Matrices::RedisMatrix.from_csv(csv_file)
       expect(m[9, 200]).to eq(0.0)
       expect(m[419, 276]).to eq(1.0)
     end
   end
 
   describe "#column" do
-    let(:csv_file) { File.join(File.dirname(__FILE__), "..", "fixtures", "jaccard_10.csv") }
+    let(:csv_file) { File.join(File.dirname(__FILE__), "..", "..", "fixtures", "jaccard_10.csv") }
     after(:each) { Dumagst.configuration.redis_connection.flushdb }
-    subject { Dumagst::Matrix.from_csv(csv_file) }
+    subject { Dumagst::Matrices::RedisMatrix.from_csv(csv_file) }
     it "returns the column as an array with correct size" do
       col = subject.column(4)
       expect(col).to be_a(Array)

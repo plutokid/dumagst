@@ -32,4 +32,7 @@ describe Dumagst::Engines::JaccardSimilarity do
       expect(subject.similarity_for([], [])).to eq(0)
     end
   end
+
+  describe "#binary_similarity_for" do
+  end
 end

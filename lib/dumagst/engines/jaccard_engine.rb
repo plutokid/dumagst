@@ -6,7 +6,7 @@ module Dumagst
       def initialize(opts)
         super(opts)
         @engine_key = opts.fetch(:engine_key, "jaccard_similarity")
-        @matrix = Dumagst::Matrix.from_csv(@filename)
+        @matrix = Dumagst::Matrices::RedisMatrix.from_csv(@filename)
         @similarity_threshold = opts.fetch(:similarity_threshold, 0.25)
         @max_similar_users = opts.fetch(:max_similar_users, 10)
       end
@@ -29,6 +29,10 @@ module Dumagst
       def recommend_users(user_id)
         users = redis.zrevrange(key_for_user(user_id), 0, max_similar_users)
         users.count > 0 ? users.map(&:to_i) : []
+      end
+
+      def recommend_products(user_id)
+        
       end
 
       protected
