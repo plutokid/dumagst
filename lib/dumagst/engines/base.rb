@@ -4,7 +4,6 @@ module Dumagst
       
       def initialize(opts)
         @opts = opts
-        @filename = opts.fetch(:filename)
       end
 
       def process

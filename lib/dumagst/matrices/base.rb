@@ -6,6 +6,18 @@ module Dumagst
 
       attr_accessor :rows_count, :columns_count
 
+      class << self
+        def from_csv(filename, matrix_key = "matrix")
+          m = new(matrix_key: matrix_key)
+          CSV.foreach(filename, col_sep: ",") do |row|
+            product_id = row[0]
+            user_id = row[1]
+            m[product_id, user_id] = Base::VALUE_SET
+          end
+          m
+        end
+      end
+
       def initialize(opts)
         @opts = opts
         @rows_count = opts.fetch(:rows_count, 0)

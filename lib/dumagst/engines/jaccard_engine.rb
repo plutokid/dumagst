@@ -6,7 +6,7 @@ module Dumagst
       def initialize(opts)
         super(opts)
         @engine_key = opts.fetch(:engine_key, "jaccard_similarity")
-        @matrix = Dumagst::Matrices::RedisMatrix.from_csv(@filename)
+        @matrix = opts.fetch(:matrix)
         @similarity_threshold = opts.fetch(:similarity_threshold, 0.25)
         @max_similar_users = opts.fetch(:max_similar_users, 10)
       end
