@@ -21,7 +21,7 @@ module Dumagst
               store_similarity_for_user(i, j, similarity)
               store_similarity_for_user(j, i, similarity)
             end
-            puts "similarity for column #{i} and column #{j} is #{similarity}" if similarity > 0
+            #puts "similarity for column #{i} and column #{j} is #{similarity}" if similarity > 0
           end
         end
       end
