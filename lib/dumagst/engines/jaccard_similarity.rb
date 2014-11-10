@@ -11,6 +11,10 @@ module Dumagst
         ones_for_b = col_b.each_index.select { |i| col_b[i] == 1}
         similarity_for(ones_for_a, ones_for_b)
       end
+
+      def extract_product_ids(col, adjust_by = 0)
+        col.each_index.select { |i| col[i] == 1}.map {|i| i + adjust_by}
+      end
     end
   end
 end
