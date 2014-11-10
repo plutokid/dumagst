@@ -6,6 +6,8 @@ require "dumagst/matrices/redis_matrix"
 require "dumagst/matrices/native_matrix"
 require "dumagst/engines/base"
 require "dumagst/engines/jaccard_similarity"
+require "dumagst/engines/similar_product"
+require "dumagst/engines/similar_user"
 require "dumagst/engines/jaccard_engine"
 
 module Dumagst
@@ -25,10 +27,18 @@ module Dumagst
   end
 
   class Configuration
-    attr_accessor :host, :port, :db
+    attr_accessor :host, :port, :db, :score_scale
 
     def redis_connection
       @redis ||= Redis.new(host: host, port:port, db:db)
+    end
+
+    def score_scale
+      @score_scale || 1000 #default
+    end
+
+    def score_scale=(score_scale)
+      @score_scale = score_scale
     end
 
   end

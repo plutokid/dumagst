@@ -32,14 +32,14 @@ module Dumagst
         end
       end
 
-      def recommend_users(user_id)
-        users = redis.zrevrange(key_for_user(user_id), 0, max_similar_users)
-        users.count > 0 ? users.map(&:to_i) : []
+      def recommend_users(user_id, with_scores = true)
+        users = redis.zrevrange(key_for_user(user_id), 0, max_similar_users, with_scores: with_scores)
+        users.count > 0 ? users.map{| u| SimilarUser.new(u[0].to_i, u[1]) } : []
       end
 
-      def recommend_products(user_id)
-        products = redis.zrevrange(key_for_product(user_id), 0, max_similar_products)
-        products.count > 0 ? products.map(&:to_i) : []
+      def recommend_products(user_id, with_scores = true)
+        products = redis.zrevrange(key_for_product(user_id), 0, max_similar_products, with_scores: with_scores)
+        products.count > 0 ? products.map{|p| SimilarProduct.new(p[0].to_i, p[1]) } : []
       end
 
       protected
@@ -77,10 +77,12 @@ module Dumagst
         ].join(".")
       end
 
-      #def key_for_product()
-
       def scaled_score(score)
-        (score * 1000.0).to_i
+        (score * score_scale).to_i
+      end
+
+      def score_scale
+        Dumagst.configuration.score_scale
       end
 
       private

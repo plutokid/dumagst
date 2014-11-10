@@ -5,11 +5,17 @@ describe Dumagst::Engines::JaccardEngine do
       let(:matrix) { Dumagst::Matrices::RedisMatrix.from_csv(csv_file) }
       before(:each) { Dumagst.configuration.redis_connection.flushdb }
       subject { Dumagst::Engines::JaccardEngine.new(matrix: matrix, similarity_threshold: 0.2)}
-      it "returns a set of user ids ordered by similarity" do
+      it "returns a set of similar user objects ordered by similarity with scores" do
         subject.process
-        expect(subject.recommend_users(1)).to eq([4, 3, 2])
-        expect(subject.recommend_users(2)).to eq([6, 1, 4])
-        expect(subject.recommend_users(6)).to eq([2])
+
+        expect(subject.recommend_users(1).map(&:user_id)).to eq([4, 3, 2])
+        expect(subject.recommend_users(1).map(&:score)).to eq([400.0, 333.0, 250.0])
+
+        expect(subject.recommend_users(2).map(&:user_id)).to eq([6, 1, 4])
+        expect(subject.recommend_users(2).map(&:score)).to eq([333.0, 250.0, 200.0])
+
+        expect(subject.recommend_users(6).map(&:user_id)).to eq([2])
+        expect(subject.recommend_users(6).map(&:score)).to eq([333.0])
       end
       it "returns an empty array if there are no similar users" do
         engine = Dumagst::Engines::JaccardEngine.new(matrix: matrix, similarity_threshold: 0.4)
@@ -21,11 +27,16 @@ describe Dumagst::Engines::JaccardEngine do
       let(:matrix) { Dumagst::Matrices::NativeMatrix.from_csv(csv_file, 9, 8) }
       before(:each) { Dumagst.configuration.redis_connection.flushdb }
       subject { Dumagst::Engines::JaccardEngine.new(matrix: matrix, similarity_threshold: 0.2)}
-      it "returns a set of user ids ordered by similarity" do
+      it "returns a set of similar user objects ordered by similarity with scores" do
         subject.process
-        expect(subject.recommend_users(1)).to eq([4, 3, 2])
-        expect(subject.recommend_users(2)).to eq([6, 1, 4])
-        expect(subject.recommend_users(6)).to eq([2])
+        expect(subject.recommend_users(1).map(&:user_id)).to eq([4, 3, 2])
+        expect(subject.recommend_users(1).map(&:score)).to eq([400.0, 333.0, 250.0])
+        
+        expect(subject.recommend_users(2).map(&:user_id)).to eq([6, 1, 4])
+        expect(subject.recommend_users(2).map(&:score)).to eq([333.0, 250.0, 200.0])
+        
+        expect(subject.recommend_users(6).map(&:user_id)).to eq([2])
+        expect(subject.recommend_users(6).map(&:score)).to eq([333.0])
       end
       it "returns an empty array if there are no similar users" do
         engine = Dumagst::Engines::JaccardEngine.new(matrix: matrix, similarity_threshold: 0.4)
@@ -39,9 +50,18 @@ describe Dumagst::Engines::JaccardEngine do
       before(:each) { Dumagst.configuration.redis_connection.flushdb }
       let(:matrix) { Dumagst::Matrices::NativeMatrix.from_csv(csv_file, 9, 8) }
       subject { Dumagst::Engines::JaccardEngine.new(matrix: matrix, similarity_threshold: 0.2)}
-      it "returns a set of products that the user might like given the user ID" do
-        expect(subject.recommend_products(1)).to eq([4, 3, 2])
-        puts "ulala"
+      it "returns an empty array if there are no matches" do
+        subject.process
+        expect(subject.recommend_products(22, false)).to eq([])
+      end
+      it "returns a set of similar products that the user might like given the user ID" do
+        subject.process
+        expect(subject.recommend_products(1, false).map(&:product_id)).to eq([9, 3, 2, 1, 5, 7])
+      end
+
+      it "returns the set of similar products with scores by default" do
+        subject.process
+        expect(subject.recommend_products(2).map(&:score)).to eq([333.0, 333.0, 250.0, 200.0, 200.0, 200.0, 200.0])
       end
     end    
   end
