@@ -15,6 +15,7 @@ module Dumagst
       def process
         columns_count = matrix.columns_count
         log_total_count(columns_count)
+        iterations = 0
         for i in 1..columns_count
           for j in i+1..columns_count
             column_i = matrix.column(i)
@@ -24,9 +25,11 @@ module Dumagst
               #user is similar enough
               store_similarity_for_user(i, j, similarity)
               store_similarity_for_user(j, i, similarity)
-              store_similar_products_for_user(i, column_j, similarity)
-              store_similar_products_for_user(j, column_i, similarity)
+              store_similar_products_for_user(i, column_i, column_j, similarity)
+              store_similar_products_for_user(j, column_j, column_i, similarity)
               log_similarity(i, j, similarity)
+              iterations += 1
+              logger.debug "processed #{iterations} out of #{log_total_count}" if iterations % 10000 == 0
             end
           end
         end
@@ -52,9 +55,11 @@ module Dumagst
         result
       end
 
-      def store_similar_products_for_user(user_id, similar_column, score)
+      def store_similar_products_for_user(user_id, user_column, similar_column, score)
         # adjust the ids by one as we start counting from zero
-        product_ids = extract_product_ids(similar_column, 1)
+        own_ids = extract_product_ids(user_column, 1)
+        product_ids = extract_product_ids(similar_column, 1) - own_ids
+
         product_ids.map do |product_id|
           redis.zadd(key_for_product(user_id), scaled_score(score), product_id)
           log_product_similarity(user_id, product_id, score)

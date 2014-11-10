@@ -54,14 +54,15 @@ describe Dumagst::Engines::JaccardEngine do
         subject.process
         expect(subject.recommend_products(22, false)).to eq([])
       end
-      it "returns a set of similar products that the user might like given the user ID" do
+      it "returns a set of similar products that the user might like given the user ID, excluding user's own likes" do
         subject.process
-        expect(subject.recommend_products(1, false).map(&:product_id)).to eq([9, 3, 2, 1, 5, 7])
+        #without the filter by own id that would be [9, 3, 2, 1, 5, 7] as the user 1 likes [2,3,5]
+        expect(subject.recommend_products(1, false).map(&:product_id)).to eq([9, 1, 7])
       end
 
       it "returns the set of similar products with scores by default" do
         subject.process
-        expect(subject.recommend_products(2).map(&:score)).to eq([333.0, 333.0, 250.0, 200.0, 200.0, 200.0, 200.0])
+        expect(subject.recommend_products(2).map(&:score)).to eq([333.0, 250.0, 200.0, 200.0, 200.0])
       end
     end    
   end
