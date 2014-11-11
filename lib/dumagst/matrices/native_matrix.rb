@@ -43,16 +43,13 @@ module Dumagst
       end
 
       def column(y)
-        # remove the zero element
-        arr = matrix.column(y).to_a
-        arr.shift
-        arr
+        col = matrix.column(y).to_a
+        col.empty? ? Array.new(rows_count, 0) : col
       end
 
       def row(x)
-        arr = matrix.row(x).to_a
-        arr.shift
-        arr
+        row = matrix.row(x).to_a
+        row.empty? ? Array.new(columns_count, 0) : row
       end
 
       def dimensions
