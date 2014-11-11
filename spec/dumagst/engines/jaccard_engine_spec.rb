@@ -66,4 +66,15 @@ describe Dumagst::Engines::JaccardEngine do
       end
     end    
   end
+  describe "#users_with_recommended_products" do
+    context "with a native matrix" do
+      before(:each) { Dumagst.configuration.redis_connection.flushdb }
+      let(:matrix) { Dumagst::Matrices::NativeMatrix.from_csv(csv_file, 9, 8) }
+      subject { Dumagst::Engines::JaccardEngine.new(matrix: matrix, similarity_threshold: 0.4)}
+      it "returns the ids of the users that have recommended products" do
+        subject.process
+        expect(subject.users_with_recommended_products).to eq([8, 1, 4])
+      end
+    end
+  end
 end

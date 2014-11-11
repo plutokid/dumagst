@@ -10,8 +10,8 @@ describe Dumagst::Matrices::NativeMatrix do
 
   describe "#column" do
     it "returns an array of elements comprising requested column" do
-      expect(subject.column(1)).to eq([0, 1, 1, 0, 1, 0, 0, 0, 0])
-      expect(subject.column(8)).to eq([1, 0, 0, 0, 0, 1, 0, 0, 0])
+      expect(subject.column(1)).to eq([0, 0, 1, 1, 0, 1, 0, 0, 0, 0])
+      expect(subject.column(8)).to eq([0, 1, 0, 0, 0, 0, 1, 0, 0, 0])
     end
     it "returns an empty array if the column index is out of range" do
       expect(subject.column(380)).to eq([])
@@ -20,8 +20,8 @@ describe Dumagst::Matrices::NativeMatrix do
   
   describe "#row" do
     it "returns an array of elements comprising requested row" do
-      expect(subject.row(1)).to eq([0, 0, 0, 1, 1, 0, 0, 1])
-      expect(subject.row(8)).to eq([0, 0, 0, 0, 0, 1, 0, 0])
+      expect(subject.row(1)).to eq([0, 0, 0, 0, 1, 1, 0, 0, 1])
+      expect(subject.row(8)).to eq([0, 0, 0, 0, 0, 0, 1, 0, 0])
     end
     it "returns an empty array if the row index is out of range" do
       expect(subject.row(380)).to eq([])
