@@ -43,13 +43,17 @@ module Dumagst
       end
 
       def column(y)
-        col = matrix.column(y).to_a
-        col.empty? ? Array.new(rows_count, 0) : col
+        raise "column #{y} is outside of the matrix column range [0..#{columns_count-1}]" unless y < columns_count
+        matrix.column(y).to_a
+        # col = matrix.column(y).to_a
+        # col.empty? ? Array.new(rows_count, 0) : col
       end
 
       def row(x)
-        row = matrix.row(x).to_a
-        row.empty? ? Array.new(columns_count, 0) : row
+        raise "row #{x} is outside of the matrix row range [0..#{row_count-1}]" unless x < rows_count
+        matrix.row(x).to_a
+        # row = matrix.row(x).to_a
+        # row.empty? ? Array.new(columns_count, 0) : row
       end
 
       def dimensions

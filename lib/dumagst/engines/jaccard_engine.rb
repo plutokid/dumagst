@@ -17,10 +17,11 @@ module Dumagst
 
       def process
         columns_count = matrix.columns_count
+        total_iterations = total_comparisons_count(columns_count)
         log_total_count(columns_count)
         iterations = 0
-        for i in 1..columns_count
-          for j in i+1..columns_count
+        for i in 1..columns_count - 1
+          for j in i+1..columns_count - 1
             column_i = matrix.column(i)
             column_j = matrix.column(j)
             similarity = binary_similarity_for(column_i, column_j)
@@ -32,9 +33,9 @@ module Dumagst
               store_similar_products_for_user(i, column_i, column_j, similarity)
               store_similar_products_for_user(j, column_j, column_i, similarity)
               log_similarity(i, j, similarity)
-              iterations += 1
-              logger.debug "processed #{iterations} out of #{log_total_count}" if iterations % 10000 == 0
             end
+            iterations += 1
+            logger.debug "processed #{iterations} out of #{total_iterations}" if iterations % 10000 == 0
           end
         end
       end
@@ -111,8 +112,12 @@ module Dumagst
 
       include JaccardSimilarity
 
+      def total_comparisons_count(columns_count)
+        (columns_count * columns_count) / 2
+      end
+
       def log_total_count(count)
-        comparisons = (count * count) / 2
+        comparisons = total_comparisons_count(count)
         logger.debug("Jaccard Engine: processing #{count} columns, #{comparisons} comparisons to do")
       end
 
