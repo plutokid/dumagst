@@ -9,14 +9,9 @@ Dumagst.configure do |config|
   config.host = "localhost"
   config.port = 6379
   config.db = 1
+  config.minimal_rating_for_like = 3
 end
-# filename = File.join(
-#   File.dirname(__FILE__),
-#   "..",
-#   "spec",
-#   "fixtures",
-#   "products_users_sorted_1656_943.csv"
-# )
+
 data_dir = File.join(
   File.dirname(__FILE__),
   "..",
@@ -35,7 +30,7 @@ logger.info "Input file : #{File.absolute_path(input_filename)}"
 logger.info "Matrix dimensions: #{dimensions[0]} products by #{dimensions[1]} users"
 Dumagst.configuration.redis_connection.flushdb
 matrix = Dumagst::Matrices::NativeMatrix.from_csv(input_filename, dimensions[0], dimensions[1])
-engine = Dumagst::Engines::JaccardEngine.new(engine_key: "jaccard_native_similarity", matrix: matrix, similarity_threshold: 0.5)
+engine = Dumagst::Engines::JaccardEngine.new(engine_key: "jaccard_native_similarity", matrix: matrix, similarity_threshold: 0.4)
 
 engine.process
 

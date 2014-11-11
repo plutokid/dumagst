@@ -27,7 +27,7 @@ module Dumagst
   end
 
   class Configuration
-    attr_accessor :host, :port, :db, :score_scale
+    attr_accessor :host, :port, :db, :score_scale, :minimal_rating_for_like
 
     def redis_connection
       @redis ||= Redis.new(host: host, port:port, db:db)
@@ -39,6 +39,14 @@ module Dumagst
 
     def score_scale=(score_scale)
       @score_scale = score_scale
+    end
+
+    def minimal_rating_for_like
+      @minimal_rating_for_like || 3
+    end
+
+    def minimal_rating_for_like=(minimal_rating_for_like)
+      @minimal_rating_for_like = minimal_rating_for_like
     end
 
   end

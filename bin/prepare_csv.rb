@@ -2,6 +2,14 @@
 require 'csv'
 require 'yaml'
 require 'logger'
+require 'dumagst'
+
+Dumagst.configure do |config|
+  config.host = "localhost"
+  config.port = 6379
+  config.db = 1
+  config.minimal_rating_for_like = 3
+end
 
 logger = Logger.new(STDOUT)
 logger.level = Logger::DEBUG
@@ -11,7 +19,7 @@ input_filename = ARGV[0] || File.join(dirname, "..", "data", "ml-100k", "u.data"
 output_filename = ARGV[1] || File.join(dirname, "..", "data", "data.csv")
 metadata_filename = File.join(File.dirname(output_filename), "dimensions.csv")
 #fixture_filename = File.join(dirname, "..", "spec", "fixtures", "products_users.csv")
-threshold = (ARGV[2] || 3).to_i
+threshold = (ARGV[2] || Dumagst.configuration.minimal_rating_for_like).to_i
 
 output_file = CSV.open(output_filename, "wb")
 #fixtures_file = CSV.open(fixture_filename, "wb")
