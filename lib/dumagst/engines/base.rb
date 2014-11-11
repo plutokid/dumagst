@@ -23,6 +23,10 @@ module Dumagst
 
       end
 
+      def users_with_recommended_products
+        raise "Implement #users_with_recommended_products in a subclass!"
+      end
+
       def logging_enabled?
         @logging_enabled
       end

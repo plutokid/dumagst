@@ -1,6 +1,9 @@
 module Dumagst
   module Engines
     class JaccardEngine < Base
+      
+      KEY_SEPARATOR = "."
+      
       attr_reader :similarity_threshold, :max_similar_users, :max_similar_products
 
       def initialize(opts)
@@ -21,6 +24,7 @@ module Dumagst
             column_i = matrix.column(i)
             column_j = matrix.column(j)
             similarity = binary_similarity_for(column_i, column_j)
+
             if similarity >= similarity_threshold
               #user is similar enough
               store_similarity_for_user(i, j, similarity)
@@ -45,6 +49,16 @@ module Dumagst
         products.count > 0 ? products.map{|p| SimilarProduct.new(p[0].to_i, p[1]) } : []
       end
 
+      def users_with_recommended_products
+        product_key_pattern = (similar_products_key_array << "*").join(KEY_SEPARATOR)
+        keys = redis.keys(product_key_pattern)
+        if keys.empty?
+          []
+        else
+          keys.map {|key| key.split(KEY_SEPARATOR)[2].to_i }
+        end
+      end
+
       protected
 
       attr_accessor :matrix, :engine_key
@@ -57,8 +71,8 @@ module Dumagst
 
       def store_similar_products_for_user(user_id, user_column, similar_column, score)
         # adjust the ids by one as we start counting from zero
-        own_ids = extract_product_ids(user_column, 1)
-        product_ids = extract_product_ids(similar_column, 1) - own_ids
+        own_ids = extract_product_ids(user_column)
+        product_ids = extract_product_ids(similar_column) - own_ids
 
         product_ids.map do |product_id|
           redis.zadd(key_for_product(user_id), scaled_score(score), product_id)
@@ -71,15 +85,18 @@ module Dumagst
           "#{engine_key}",
           "similar_users",
           "#{user_id}"
-        ].join(".")
+        ].join(KEY_SEPARATOR)
       end
 
-      def key_for_product(user_id)
+      def similar_products_key_array
         [
           "#{engine_key}",
           "similar_products",
-          "#{user_id}"
-        ].join(".")
+        ]
+      end
+
+      def key_for_product(user_id)
+        (similar_products_key_array << "#{user_id}").join(KEY_SEPARATOR)
       end
 
       def scaled_score(score)
