@@ -7,9 +7,11 @@ module Dumagst
       end
 
       def binary_similarity_for(col_a, col_b)
-        ones_for_a = col_a.each_index.select { |i| col_a[i] == 1}
-        ones_for_b = col_b.each_index.select { |i| col_b[i] == 1}
-        similarity_for(ones_for_a, ones_for_b)
+        raise "arguments must have the same size. Got #{col_a.size} and #{col_b.size}" unless col_a.size == col_b.size
+        m11 = col_a.each_index.select {|i| col_a[i] == 1 && col_a[i] == col_b[i] }.size
+        m01 = col_a.each_index.select {|i| col_a[i] == 1 && col_b[i] == 0 }.size
+        m10 = col_a.each_index.select {|i| col_a[i] == 0 && col_b[i] == 1 }.size
+        m11 == 0 ? 0 : (0.0 + m11) / (m01 + m10 + m11)
       end
 
       def extract_product_ids(col, adjust_by = 0)

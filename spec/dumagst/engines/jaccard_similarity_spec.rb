@@ -46,5 +46,13 @@ describe Dumagst::Engines::JaccardSimilarity do
   end
 
   describe "#binary_similarity_for" do
+    it "returns correct similarity for the case when sets are binary vectors" do
+      a = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0]
+      b = [1, 1, 1, 0, 0, 0, 0, 1, 0, 1]
+      expect(subject.binary_similarity_for(a, b)).to eq(1.0 / 7)
+    end
+    it "raises if dimensions mismatch" do
+      expect { subject.binary_similarity_for([1, 0, 1], [1, 0])}.to raise_error
+    end
   end
 end
