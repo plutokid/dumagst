@@ -29,5 +29,20 @@ describe Dumagst::Matrices::NativeMatrix do
     end
   end
 
+  describe "#each_row_index" do
+    it "provides an enumerator over the row indices" do
+      
+    end
+  end
+
+  describe "to_signature_matrix" do
+    it "returns a NativeMatrix with the required dimensions" do
+      sig = subject.to_signature_matrix(5)
+      expect(sig).to be_a(Dumagst::Matrices::NativeMatrix)
+      expect(sig.rows_count).to eq(5)
+      expect(sig.columns_count).to eq(9)
+    end
+  end
+
 
 end

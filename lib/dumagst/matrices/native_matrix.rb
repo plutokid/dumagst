@@ -23,11 +23,16 @@ module Dumagst
       def initialize(opts)
         rows_count = opts.fetch(:rows_count)
         columns_count = opts.fetch(:columns_count)
-        @matrix = MutableMatrix.zero(rows_count, columns_count)
+        fill_with_value = opts.fetch(:fill_with, 0)
+        @matrix = MutableMatrix.build(rows_count, columns_count) {|row, col| fill_with_value }
       end
 
       def rows_count
         matrix.row_count
+      end
+
+      def each_row_index
+        (0..rows_count-1).each { |c| yield c }
       end
 
       def columns_count
@@ -45,19 +50,33 @@ module Dumagst
       def column(y)
         raise "column #{y} is outside of the matrix column range [0..#{columns_count-1}]" unless y < columns_count
         matrix.column(y).to_a
-        # col = matrix.column(y).to_a
-        # col.empty? ? Array.new(rows_count, 0) : col
       end
 
       def row(x)
-        raise "row #{x} is outside of the matrix row range [0..#{row_count-1}]" unless x < rows_count
+        raise "row #{x} is outside of the matrix row range [0..#{rows_count-1}]" unless x < rows_count
         matrix.row(x).to_a
-        # row = matrix.row(x).to_a
-        # row.empty? ? Array.new(columns_count, 0) : row
       end
 
       def dimensions
         [rows_count, columns_count]
+      end
+
+      def to_signature_matrix(buckets)
+        raise "can't have more buckets than rows" if buckets > rows_count
+        sig = NativeMatrix.new(rows_count: buckets, columns_count: columns_count, fill_with: Float::INFINITY)
+        minhash_functions = Array.new(buckets, MinhashFunction.generate(buckets))
+        hr = minhash_functions.each.map do |func|
+          (0..rows_count).map {|row_count| puts row_count; func.hash_for(row_count) }
+        end
+        require 'pry' ; binding.pry
+        for i in 1..rows_count
+          (0..minhash_functions.size).each do |hsh_index|
+            dupa = hsh_index
+            
+            hr << (0..rows_count).map {|row_count| minhash_functions[dupa].hash_for(row_count) }
+          end
+          puts "ulala"
+        end
       end
 
       private
