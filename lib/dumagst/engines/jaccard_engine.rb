@@ -22,7 +22,7 @@ module Dumagst
           matrix.each_column_index.drop(i+1).each do |j|
             column_i = matrix.column(i)
             column_j = matrix.column(j)
-            similarity = binary_similarity_for(column_i, column_j)
+            similarity = calculate_similarity(column_i, column_j)
             store_similar_user_and_products(i, j, similarity) if similarity >= similarity_threshold
             iterations += 1
             logger.debug "processed #{iterations} out of #{total_iterations}" if iterations % 10000 == 0
@@ -54,6 +54,10 @@ module Dumagst
       protected
 
       attr_accessor :matrix
+
+      def calculate_similarity(col_a, col_b)
+        binary_similarity_for(col_a, col_b)
+      end
 
       include Similarity
 

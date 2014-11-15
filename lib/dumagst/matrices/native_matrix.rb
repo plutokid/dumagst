@@ -31,7 +31,7 @@ module Dumagst
         matrix.row_count
       end
 
-      def each_row_index
+      def each_row_index(&block)
         if block_given?
           (0..rows_count-1).each { |c| yield c }
         else
@@ -88,18 +88,22 @@ module Dumagst
 
       def signature_matrix(buckets)
         raise "can't have more buckets than rows" if buckets > rows_count
-        sig = NativeMatrix.new(rows_count: buckets, columns_count: columns_count, fill_with: Float::INFINITY, binary: false)
-        minhash_functions = Array.new(buckets) {|b| MinhashFunction.generate(buckets) }
+        sig = NativeMatrix.new(rows_count: buckets, columns_count: columns_count, fill_with: Float::INFINITY)
+        minhash_functions = generate_minhash_functions(buckets)
         each_row_index do |r|
           hash_values = minhash_functions.map {|func| func.hash_for(r)}
-          each_column_index do |c|
-            hash_values.each_index {|i| sig[i, c] = (sig[i, c] < hash_values[i] ? sig[i, c] : hash_values[i]) } if self[r, c] != 0
+          each_column_index.select {|ci| self[r,ci] != 0 }.each do |c|
+            hash_values.each_index {|i| sig[i, c] = (sig[i, c] < hash_values[i] ? sig[i, c] : hash_values[i]) }
           end
         end
         sig
       end
 
       private
+
+      def generate_minhash_functions(buckets)
+        Array.new(buckets) {|b| MinhashFunction.generate(buckets) }
+      end
 
       attr_accessor :matrix
 

@@ -2,7 +2,7 @@ describe Dumagst::Matrices::NativeMatrix do
   let(:csv_file) { File.join(File.dirname(__FILE__), "..", "..", "fixtures", "jaccard_10.csv") }
   subject { Dumagst::Matrices::NativeMatrix.from_csv(csv_file, 9, 8) }
   describe ".from_csv" do
-    it "returns a matrix given the CSV filename , row and column count" do
+    it "returns a matrix given the CSV filename , row and column count, padding the size to accomodate for the zero row and column" do
       expect(subject).to be_a(Dumagst::Matrices::NativeMatrix)
       expect(subject.dimensions).to eq([10, 9])
     end
@@ -51,29 +51,29 @@ describe Dumagst::Matrices::NativeMatrix do
     require 'terminal-table'
     it "returns a NativeMatrix with the required dimensions" do
       sig = subject.signature_matrix(9)
-      #puts sig.inspect
-      real_sims = []
-      subject.each_column_index do |r|
-        real_sims << subject.each_column_index.map do |rr|
-          nil if r == rr
-          sprintf("%4.3f", binary_similarity_for(subject.column(r), subject.column(rr)))
-        end
-      end
-      sig_sims = []
-      sig.each_column_index do |r|
-        sig_sims << sig.each_column_index.map do |rr|
-          nil if r == rr
-          sprintf("%4.3f", minhash_similarity_for(sig.column(r), sig.column(rr)))
-        end
-      end
-      real_table = Terminal::Table.new :rows => real_sims
-      puts real_table
-      sig_table = Terminal::Table.new :rows => sig_sims
-      puts sig_table
-      #require 'pry'; binding.pry
       expect(sig).to be_a(Dumagst::Matrices::NativeMatrix)
       expect(sig.rows_count).to eq(9)
       expect(sig.columns_count).to eq(9)
+    end
+    it "returns a NativeMatrix with symmetric similarities and 1.0 for diagonal elements" do
+      sig = subject.signature_matrix(9)
+      sig_sims = []
+      sig.each_column_index do |r|
+        sig_sims << sig.each_column_index.map do |rr|
+          sprintf("%4.3f", minhash_similarity_for(sig.column(r), sig.column(rr)))
+        end
+      end
+      # sig_table = Terminal::Table.new :rows => sig_sims
+      # puts sig_table
+      (1..8).each do |i|
+        (1..8).each do |j|
+          if i == j 
+            expect(sig_sims[i][i].to_f).to eq(1.0)
+          else
+            expect(sig_sims[i][j]).to eq(sig_sims[i][j])
+          end
+        end
+      end
     end
   end
 end
