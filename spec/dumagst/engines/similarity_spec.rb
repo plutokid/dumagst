@@ -1,7 +1,7 @@
-describe Dumagst::Engines::JaccardSimilarity do
+describe Dumagst::Engines::Similarity do
   let(:test_class) do
     Class.new do
-      include Dumagst::Engines::JaccardSimilarity
+      include Dumagst::Engines::Similarity
     end
   end
   subject { test_class.new }

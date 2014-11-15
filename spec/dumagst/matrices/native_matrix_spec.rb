@@ -46,18 +46,8 @@ describe Dumagst::Matrices::NativeMatrix do
     end
   end
 
-  describe "#binary?" do
-    it "returns true for a matrix created with .from_csv" do
-      expect(subject).to be_binary
-    end
-    it "returns false if explicitly created with binary:false" do
-      matrix = Dumagst::Matrices::NativeMatrix.new(rows_count: 2, columns_count: 4, binary: false)
-      expect(matrix).to_not be_binary
-    end
-  end
-
   describe "signature_matrix" do
-    include Dumagst::Engines::JaccardSimilarity
+    include Dumagst::Engines::Similarity
     require 'terminal-table'
     it "returns a NativeMatrix with the required dimensions" do
       sig = subject.signature_matrix(9)

@@ -1,6 +1,6 @@
 module Dumagst
   module Engines
-    module JaccardSimilarity
+    module Similarity
       def similarity_for(col_a, col_b)
         union = col_a | col_b
         union.size > 0 ? (col_a & col_b ).size.to_f / union.size : 0
@@ -19,9 +19,6 @@ module Dumagst
         m11 == 0 ? 0 : (0.0 + m11) / (m01 + m10 + m11)
       end
 
-      def extract_product_ids(col, adjust_by = 0)
-        col.each_index.select { |i| col[i] == 1}.map {|i| i + adjust_by}
-      end
     end
   end
 end

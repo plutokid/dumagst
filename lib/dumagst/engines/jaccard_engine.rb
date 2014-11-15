@@ -1,9 +1,7 @@
 module Dumagst
   module Engines
     class JaccardEngine < Base
-      
-      KEY_SEPARATOR = "."
-      
+
       attr_reader :similarity_threshold, :max_similar_users, :max_similar_products
 
       def initialize(opts)
@@ -20,24 +18,17 @@ module Dumagst
         total_iterations = total_comparisons_count(columns_count)
         log_total_count(columns_count)
         iterations = 0
-        for i in 1..columns_count - 1
-          for j in i+1..columns_count - 1
+        matrix.each_column_index.drop(1).each do |i|
+          matrix.each_column_index.drop(i+1).each do |j|
             column_i = matrix.column(i)
             column_j = matrix.column(j)
-            similarity = matrix.binary? ? binary_similarity_for(column_i, column_j): minhash_similarity_for(column_i, column_j)
-
-            if similarity >= similarity_threshold
-              #user is similar enough
-              store_similarity_for_user(i, j, similarity)
-              store_similarity_for_user(j, i, similarity)
-              store_similar_products_for_user(i, column_i, column_j, similarity)
-              store_similar_products_for_user(j, column_j, column_i, similarity)
-              log_similarity(i, j, similarity)
-            end
+            similarity = binary_similarity_for(column_i, column_j)
+            store_similar_user_and_products(i, j, similarity) if similarity >= similarity_threshold
             iterations += 1
             logger.debug "processed #{iterations} out of #{total_iterations}" if iterations % 10000 == 0
           end
         end
+
       end
 
       def recommend_users(user_id, with_scores = true)
@@ -62,55 +53,23 @@ module Dumagst
 
       protected
 
-      attr_accessor :matrix, :engine_key
+      attr_accessor :matrix
 
-      def store_similarity_for_user(user_id, similar_user_id, score)
-        result = redis.zadd(key_for_user(user_id), scaled_score(score), similar_user_id)
-        raise "Cannot set similarity for #{user_id}, similar user : #{similar_user_id}, score : #{score}" unless result
-        result
+      include Similarity
+
+      def store_similar_user_and_products(user_index, similar_user_index, similarity)
+        store_similarity_for_user(user_index, similar_user_index, similarity)
+        store_similarity_for_user(similar_user_index, user_index, similarity)
+        # get the products from the original matrix
+        user_products = matrix.column(user_index)
+        similar_user_products = matrix.column(similar_user_index)
+        store_similar_products_for_user(user_index, user_products, similar_user_products, similarity)
+        store_similar_products_for_user(similar_user_index, similar_user_products, user_products, similarity)
       end
 
-      def store_similar_products_for_user(user_id, user_column, similar_column, score)
-        # adjust the ids by one as we start counting from zero
-        own_ids = extract_product_ids(user_column)
-        product_ids = extract_product_ids(similar_column) - own_ids
-
-        product_ids.map do |product_id|
-          redis.zadd(key_for_product(user_id), scaled_score(score), product_id)
-          log_product_similarity(user_id, product_id, score)
-        end if product_ids.count > 0
-      end
-
-      def key_for_user(user_id)
-        [
-          "#{engine_key}",
-          "similar_users",
-          "#{user_id}"
-        ].join(KEY_SEPARATOR)
-      end
-
-      def similar_products_key_array
-        [
-          "#{engine_key}",
-          "similar_products",
-        ]
-      end
-
-      def key_for_product(user_id)
-        (similar_products_key_array << "#{user_id}").join(KEY_SEPARATOR)
-      end
-
-      def scaled_score(score)
-        (score * score_scale).to_i
-      end
-
-      def score_scale
-        Dumagst.configuration.score_scale
-      end
 
       private
 
-      include JaccardSimilarity
 
       def total_comparisons_count(columns_count)
         (columns_count * columns_count) / 2
@@ -118,15 +77,15 @@ module Dumagst
 
       def log_total_count(count)
         comparisons = total_comparisons_count(count)
-        logger.debug("Jaccard Engine: processing #{count} columns, #{comparisons} comparisons to do")
+        logger.debug("#{self.class}: processing #{count} columns, #{comparisons} comparisons to do")
       end
 
       def log_similarity(user_id, similar_user_id, score)
-        logger.info("Jaccard Engine: User #{user_id} is similar to the user #{similar_user_id}, score: #{score}")
+        logger.info("#{self.class}: User #{user_id} is similar to the user #{similar_user_id}, score: #{score}")
       end
 
       def log_product_similarity(user_id, product_id, score)
-        logger.info("Jaccard Engine: User #{user_id} : similar product #{product_id}, score: #{score}")
+        logger.info("#{self.class}: User #{user_id} : similar product #{product_id}, score: #{score}")
       end
 
     end

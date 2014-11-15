@@ -10,7 +10,7 @@ module Dumagst
       class << self
         def from_csv(filename, rows_count, columns_count)
           # add padding and discard the row 0 and column 0
-          m = new(rows_count: rows_count + 1, columns_count: columns_count + 1, binary: true)
+          m = new(rows_count: rows_count + 1, columns_count: columns_count + 1)
           CSV.foreach(filename, col_sep: ",") do |row|
             product_id = row[0]
             user_id = row[1]
@@ -24,16 +24,11 @@ module Dumagst
         rows_count = opts.fetch(:rows_count)
         columns_count = opts.fetch(:columns_count)
         fill_with_value = opts.fetch(:fill_with, 0)
-        @binary = opts.fetch(:binary, false)
         @matrix = MutableMatrix.build(rows_count, columns_count) {|row, col| fill_with_value }
       end
 
       def rows_count
         matrix.row_count
-      end
-
-      def binary?
-        @binary
       end
 
       def each_row_index
@@ -52,12 +47,16 @@ module Dumagst
         end
       end
 
-      def each_row
-        each_row_index { |i| yield row(i)}
+      def each_row(&block)
+        #block_given? ? matrix.rows.to_enum
+        matrix.row_vectors.each(&block)
+        #each_row_index { |i| yield row(i)}
       end
 
-      def each_column
-        each_column_index { |i| yield column(i)}
+      def each_column(&block)
+        matrix.column_vectors.each(&block)
+        #matrix.columns.to_enum
+        #each_column_index { |i| yield column(i)}
       end
 
 

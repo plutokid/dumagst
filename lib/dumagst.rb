@@ -4,17 +4,17 @@ require "dumagst/patch_vector"
 require "dumagst/matrices/base"
 require "dumagst/matrices/redis_matrix_mapper"
 require "dumagst/matrices/redis_matrix"
-require "dumagst/matrices/minhash_function"
+require "dumagst/minhash_function"
 require "dumagst/matrices/native_matrix"
 require "dumagst/engines/base"
-require "dumagst/engines/jaccard_similarity"
+require "dumagst/engines/similarity"
 require "dumagst/engines/similar_product"
 require "dumagst/engines/similar_user"
 require "dumagst/engines/jaccard_engine"
+require "dumagst/engines/minhash_engine"
 
 module Dumagst
-  # Your code goes here...
-
+  
   class << self
     attr_accessor :configuration
   end
