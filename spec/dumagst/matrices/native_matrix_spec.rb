@@ -9,20 +9,19 @@ describe Dumagst::Matrices::NativeMatrix do
   end
 
   describe "#column" do
-    it "returns an array of elements comprising requested column" do
-      expect(subject.column(1)).to eq([0, 0, 1, 1, 0, 1, 0, 0, 0, 0])
-      expect(subject.column(8)).to eq([0, 1, 0, 0, 0, 0, 1, 0, 0, 0])
+    it "returns a Vector of elements comprising requested column" do
+      expect(subject.column(1)).to eq(Vector[0, 0, 1, 1, 0, 1, 0, 0, 0, 0])
+      expect(subject.column(8)).to eq(Vector[0, 1, 0, 0, 0, 0, 1, 0, 0, 0])
     end
     it "raises if you attempt to request a column out of the matrix column range" do
       expect { subject.column(380) }.to raise_error
     end
-    it "returns an empty array if "
   end
   
   describe "#row" do
-    it "returns an array of elements comprising requested row" do
-      expect(subject.row(1)).to eq([0, 0, 0, 0, 1, 1, 0, 0, 1])
-      expect(subject.row(8)).to eq([0, 0, 0, 0, 0, 0, 1, 0, 0])
+    it "returns a Vector of elements comprising requested row" do
+      expect(subject.row(1)).to eq(Vector[0, 0, 0, 0, 1, 1, 0, 0, 1])
+      expect(subject.row(8)).to eq(Vector[0, 0, 0, 0, 0, 0, 1, 0, 0])
     end
     it "raises if you attempt to request a row out of the matrix row range" do
       expect { subject.row(380) }.to raise_error
@@ -57,11 +56,11 @@ describe Dumagst::Matrices::NativeMatrix do
     end
   end
 
-  describe "to_signature_matrix" do
+  describe "signature_matrix" do
     include Dumagst::Engines::JaccardSimilarity
     require 'terminal-table'
     it "returns a NativeMatrix with the required dimensions" do
-      sig = subject.to_signature_matrix(9)
+      sig = subject.signature_matrix(9)
       #puts sig.inspect
       real_sims = []
       subject.each_column_index do |r|
@@ -74,7 +73,7 @@ describe Dumagst::Matrices::NativeMatrix do
       sig.each_column_index do |r|
         sig_sims << sig.each_column_index.map do |rr|
           nil if r == rr
-          sprintf("%4.3f", similarity_for(sig.column(r), sig.column(rr)))
+          sprintf("%4.3f", minhash_similarity_for(sig.column(r), sig.column(rr)))
         end
       end
       real_table = Terminal::Table.new :rows => real_sims
@@ -87,6 +86,4 @@ describe Dumagst::Matrices::NativeMatrix do
       expect(sig.columns_count).to eq(9)
     end
   end
-
-
 end

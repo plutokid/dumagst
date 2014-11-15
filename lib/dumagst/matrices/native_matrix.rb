@@ -75,19 +75,19 @@ module Dumagst
 
       def column(y)
         raise "column #{y} is outside of the matrix column range [0..#{columns_count-1}]" unless y < columns_count
-        matrix.column(y).to_a
+        matrix.column(y)
       end
 
       def row(x)
         raise "row #{x} is outside of the matrix row range [0..#{rows_count-1}]" unless x < rows_count
-        matrix.row(x).to_a
+        matrix.row(x)
       end
 
       def dimensions
         [rows_count, columns_count]
       end
 
-      def to_signature_matrix(buckets)
+      def signature_matrix(buckets)
         raise "can't have more buckets than rows" if buckets > rows_count
         sig = NativeMatrix.new(rows_count: buckets, columns_count: columns_count, fill_with: Float::INFINITY, binary: false)
         minhash_functions = Array.new(buckets) {|b| MinhashFunction.generate(buckets) }
