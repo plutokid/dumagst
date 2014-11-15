@@ -65,6 +65,22 @@ describe Dumagst::Engines::JaccardEngine do
         expect(subject.recommend_products(2).map(&:score)).to eq([333.0, 250.0, 200.0, 200.0, 200.0])
       end
     end    
+    context "with a signature matrix" do
+      before(:each) { Dumagst.configuration.redis_connection.flushdb }
+      let(:matrix) { Dumagst::Matrices::NativeMatrix.from_csv(csv_file, 9, 8).to_signature_matrix(6) }
+      subject { Dumagst::Engines::JaccardEngine.new(matrix: matrix, similarity_threshold: 0.6)}
+      it "return an empty array if there are no matches" do
+        subject.process
+        expect(subject.recommend_products(22, false)).to eq([])
+      end
+
+      it "returns a set of similar products that the user might like given the user ID, excluding user's own likes" do
+        subject.process
+        #without the filter by own id that would be [9, 3, 2, 1, 5, 7] as the user 1 likes [2,3,5]
+        expect(subject.recommend_products(1, false).map(&:product_id)).to eq([5, 1])
+      end
+
+    end
   end
   describe "#users_with_recommended_products" do
     context "with a native matrix" do
@@ -75,6 +91,7 @@ describe Dumagst::Engines::JaccardEngine do
         subject.process
         expect(subject.users_with_recommended_products).to eq([8, 1, 4])
       end
+
     end
   end
 end

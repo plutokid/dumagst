@@ -4,12 +4,12 @@ module Dumagst
     class MinhashFunction
       
       attr_reader :a, :b, :buckets
-
+      RAND_MAX = 2**32 - 1
       class << self
         def generate(buckets)
           new(
-            SecureRandom.random_number(2**32 - 1),
-            SecureRandom.random_number(2**32 - 1),
+            SecureRandom.random_number(RAND_MAX),
+            SecureRandom.random_number(RAND_MAX),
             buckets
           )
         end

@@ -17,6 +17,7 @@ describe Dumagst::Matrices::MinhashFunction do
       expect(subject.hash_for(5)).to eq(53)
     end
     it "wraps over the bucket value" do
+      # (10 * 30 + 3) mod 100 = 3
       expect(subject.hash_for(30)).to eq(3)
     end
   end

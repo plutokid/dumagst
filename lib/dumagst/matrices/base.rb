@@ -24,6 +24,10 @@ module Dumagst
         @columns_count = opts.fetch(:columns_count, 0)
       end
 
+      def binary?
+        true
+      end
+
       def [](x, y)
         raise "implement [](x, y) in your subclass"
       end

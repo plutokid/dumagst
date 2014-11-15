@@ -24,7 +24,7 @@ module Dumagst
           for j in i+1..columns_count - 1
             column_i = matrix.column(i)
             column_j = matrix.column(j)
-            similarity = binary_similarity_for(column_i, column_j)
+            similarity = matrix.binary? ? binary_similarity_for(column_i, column_j): minhash_similarity_for(column_i, column_j)
 
             if similarity >= similarity_threshold
               #user is similar enough
