@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["yurivm"]
   spec.email         = ["yuri.veremeyenko@gmail.com"]
   spec.summary       = %q{A very basic recommendation engine}
-  spec.description   = %q{This should work (c)}
+  spec.description   = %q{A very basic recommendation engine using minhash and jaccard similarity, in Ruby}
   spec.homepage      = ""
   spec.license       = "MIT"
 
