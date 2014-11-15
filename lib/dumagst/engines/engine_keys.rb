@@ -1,6 +1,8 @@
 module Dumagst
   module Engines
     module EngineKeys
+      KEY_SEPARATOR = "."
+
       def key_for_user(user_id)
         [
           "#{engine_key}",
@@ -23,7 +25,7 @@ module Dumagst
       def extract_product_ids(col, adjust_by = 0)
         col.each_index.select { |i| col[i] == 1}.map {|i| i + adjust_by}
       end
-      
+
     end
   end
 end
