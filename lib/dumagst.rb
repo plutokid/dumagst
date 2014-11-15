@@ -1,5 +1,6 @@
 require 'redis'
 require "dumagst/version"
+require "dumagst/patch_vector"
 require "dumagst/matrices/base"
 require "dumagst/matrices/redis_matrix_mapper"
 require "dumagst/matrices/redis_matrix"
