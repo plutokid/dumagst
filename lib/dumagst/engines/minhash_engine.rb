@@ -2,28 +2,35 @@ module Dumagst
   module Engines
     class MinhashEngine < JaccardEngine
 
+      attr_reader :buckets
+
       def initialize(opts)
-        super(opts)
-        @engine_key = opts.fetch(:engine_key, "minhash_similarity")
+        defaults = {engine_key: "minhash_similarity", similarity_threshold: 0.75, buckets: 200}
+        super(defaults.merge(opts))
+        @buckets = opts.fetch(:buckets)
       end
 
       def process
-        signature_matrix = matrix.signature_matrix
+        signature_matrix = matrix.signature_matrix(buckets)
 
         columns_count = signature_matrix.columns_count
         total_iterations = total_comparisons_count(columns_count)
         log_total_count(columns_count)
         iterations = 0
-        signature_matrix.each_column.drop(1).each do |i|
-          signature_matrix.each_column.drop(i+1).each do |j|
+        signature_matrix.each_column_index.drop(1).each do |i|
+          signature_matrix.each_column_index.drop(i+1).each do |j|
             column_i = signature_matrix.column(i)
             column_j = signature_matrix.column(j)
-            similarity = minhash_similarity_for(column_i, column_j)
+            similarity = calculate_similarity(column_i, column_j)
             store_similar_user_and_products(i, j, similarity) if similarity >= similarity_threshold
             iterations += 1
             logger.debug "processed #{iterations} out of #{total_iterations}" if iterations % 10000 == 0
           end
         end
+      end
+
+      def calculate_similarity(col_a, col_b)
+        minhash_similarity_for(col_a, col_b)
       end
 
       protected
