@@ -5,7 +5,7 @@ module Dumagst
       attr_reader :buckets
 
       def initialize(opts)
-        defaults = {engine_key: "minhash_similarity", similarity_threshold: 0.75, buckets: 200}
+        defaults = {engine_key: "minhash_similarity", similarity_threshold: 0.75}
         super(defaults.merge(opts))
         @buckets = opts.fetch(:buckets)
       end
